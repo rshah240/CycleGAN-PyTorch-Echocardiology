@@ -47,7 +47,7 @@ class ImageDataset(Dataset):
         self.unpaired = unpaired
         self.resized_image_size = resized_image_size
 
-    def __getitem__(self, batch_index: int) -> [dict[str, Tensor], dict[str, Tensor]]:
+    def __getitem__(self, batch_index: int) -> dict:
         # Read a batch of image data
         src_image = cv2.imread(self.src_image_file_names[batch_index])
         if self.unpaired:
@@ -94,13 +94,13 @@ class Echocardiology(Dataset):
         self.transform = transforms
 
     def __len__(self)->int:
-        return len(self.src_image_file_names)
+        return len(self.dst_image_file_names)
 
     def __getitem__(self, index) -> dict:
-        src_image = Image.open(self.src_image_file_names[index])
+        src_image = Image.open(self.src_image_file_names[index]).convert("L")
         
         if self.unpaired:
-            dst_image = Image.open(self.dst_image_file_names[random.randint(0,len(self.src_image_file_names))-1]).convert("L")
+            dst_image = Image.open(self.dst_image_file_names[random.randint(0,len(self.dst_image_file_names))-1]).convert("L")
         else:
             dst_image = Image.open(self.dst_image_file_names[index]).convert("L")
 

@@ -31,7 +31,7 @@ from torch.utils.tensorboard import SummaryWriter
 from torchvision.utils import save_image
 
 import model
-from dataset import CUDAPrefetcher, ImageDataset
+from dataset import CUDAPrefetcher, ImageDataset, Echocardiology
 from imgproc import random_crop_torch, random_rotate_torch, random_vertically_flip_torch, random_horizontally_flip_torch
 from utils import load_pretrained_state_dict, load_resume_state_dict, make_directory, save_checkpoint, DecayLR, \
     ReplayBuffer, Summary, AverageMeter, ProgressMeter
@@ -42,7 +42,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--config_path",
                         type=str,
-                        default="./configs/CYCLEGAN.yaml",
+                        default="configs/CycleGAN_Echo_cardiology.yaml",
                         help="Path to train config file.")
     args = parser.parse_args()
 
@@ -65,7 +65,7 @@ def main():
     start_epoch = 0
 
     # Define the running device number
-    device = torch.device("cuda", config["DEVICE_ID"])
+    device = (torch.device("cuda", config["DEVICE_ID"]) if torch.cuda.is_available() else "cpu")
 
     train_data_prefetcher = load_datasets(config, device)
     g_A_model, g_B_model, ema_g_A_model, ema_g_B_model, d_A_model, d_B_model = build_model(config, device)
@@ -231,11 +231,12 @@ def load_datasets(
         device: torch.device,
 ) -> CUDAPrefetcher:
     # Load dataset
-    train_datasets = ImageDataset(
+    train_datasets = Echocardiology(
         config["TRAIN"]["DATASET"]["SRC_IMAGE_PATH"],
         config["TRAIN"]["DATASET"]["DST_IMAGE_PATH"],
         config["TRAIN"]["DATASET"]["UNPAIRED"],
         config["TRAIN"]["DATASET"]["IMAGE_SIZE"],
+        transforms=None
     )
     # Generator all dataloader
     train_dataloader = DataLoader(train_datasets,
@@ -247,9 +248,11 @@ def load_datasets(
                                   persistent_workers=config["TRAIN"]["HYP"]["PERSISTENT_WORKERS"])
 
     # Place all data on the preprocessing data loader
-    train_data_prefetcher = CUDAPrefetcher(train_dataloader, device)
-
-    return train_data_prefetcher
+    if torch.cuda.is_available():
+        train_data_prefetcher = CUDAPrefetcher(train_dataloader, device)
+        return train_data_prefetcher
+    else:
+        return train_dataloader
 
 
 def build_model(
@@ -401,8 +404,13 @@ def train(
     batch_index = 0
 
     # Initialize the data loader and load the first batch of data
-    train_data_prefetcher.reset()
-    batch_data = train_data_prefetcher.next()
+    if torch.cuda.is_available():
+        train_data_prefetcher.reset()
+        batch_data = train_data_prefetcher.next()
+    else:
+        iter_data = iter(train_data_prefetcher)
+        batch_data = next(iter_data)
+        
 
     batch_size = batch_data["src"].size(0)
 
@@ -418,12 +426,12 @@ def train(
         real_image_B = batch_data["dst"].to(device, non_blocking=True)
 
         # image data augmentation
-        real_image_A, real_image_B = random_crop_torch(real_image_A,
-                                                       real_image_B,
-                                                       config["TRAIN"]["DATASET"]["IMAGE_SIZE"])
-        real_image_A, real_image_B = random_rotate_torch(real_image_A, real_image_B, [0, 90, 180, 270])
-        real_image_A, real_image_B = random_vertically_flip_torch(real_image_A, real_image_B)
-        real_image_A, real_image_B = random_horizontally_flip_torch(real_image_A, real_image_B)
+        # real_image_A, real_image_B = random_crop_torch(real_image_A,
+        #                                                real_image_B,
+        #                                                config["TRAIN"]["DATASET"]["IMAGE_SIZE"])
+        # real_image_A, real_image_B = random_rotate_torch(real_image_A, real_image_B, [0, 90, 180, 270])
+        # real_image_A, real_image_B = random_vertically_flip_torch(real_image_A, real_image_B)
+        # real_image_A, real_image_B = random_horizontally_flip_torch(real_image_A, real_image_B)
 
         ##############################################
         # (1) Update G network: Generators A2B and B2A
@@ -564,7 +572,10 @@ def train(
             progress.display(batch_index + 1)
 
         # Preload the next batch of data
-        batch_data = train_data_prefetcher.next()
+        if torch.cuda.is_available():
+            batch_data = train_data_prefetcher.next()
+        else:
+            batch_data = next(iter_data)
 
         # Add 1 to the number of data batches to ensure that the terminal prints data normally
         batch_index += 1

@@ -19,7 +19,7 @@ MODEL:
     COMPILED: True
   D:
     NAME: path_discriminator
-    IN_CHANNELS: 3
+    IN_CHANNELS: 1
     OUT_CHANNELS: 1
     CHANNELS: 64
     COMPILED: False
@@ -48,7 +48,7 @@ TRAIN:
 
   # training hyperparameters
   HYP:
-    IMGS_PER_BATCH: 1
+    IMGS_PER_BATCH: 4
     SHUFFLE: True
     NUM_WORKERS: 4
     PIN_MEMORY: True
