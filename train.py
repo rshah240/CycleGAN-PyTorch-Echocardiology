@@ -138,15 +138,15 @@ def main():
         print("Resume training model not found. Start training from scratch.")
 
     # Create a experiment results
-    samples_dir = os.path.join("samples", config["EXP_NAME"])
-    results_dir = os.path.join("results", config["EXP_NAME"])
+    samples_dir = os.path.join("/content/drive/MyDrive/checkpoints/samples/", config["EXP_NAME"])
+    results_dir = os.path.join("/content/drive/MyDrive/checkpoints/results/", config["EXP_NAME"])
     make_directory(samples_dir)
     make_directory(results_dir)
     make_directory(os.path.join(samples_dir, "A"))
     make_directory(os.path.join(samples_dir, "B"))
 
     # Create training process log file
-    writer = SummaryWriter(os.path.join("samples", "logs", config["EXP_NAME"]))
+    writer = SummaryWriter(os.path.join("/content/drive/MyDrive/checkpoints/", "logs", config["EXP_NAME"]))
 
     fake_A_buffer = ReplayBuffer()
     fake_B_buffer = ReplayBuffer()
