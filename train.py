@@ -42,7 +42,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--config_path",
                         type=str,
-                        default="configs/CycleGAN_Echo_cardiology.yaml",
+                        default="/content/CycleGAN-PyTorch-Echocardiology/configs/CycleGAN_Echo_cardiology.yaml",
                         help="Path to train config file.")
     args = parser.parse_args()
 
