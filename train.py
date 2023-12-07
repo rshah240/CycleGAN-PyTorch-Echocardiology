@@ -583,10 +583,10 @@ def train(
         # Save training image
         if batch_index == batches:
             save_image(real_image_A,
-                       f"./samples/{config['EXP_NAME']}/A/real_image_A_epoch_{epoch:04d}.jpg",
+                       f"/content/drive/MyDrive/checkpoints/samples/{config['EXP_NAME']}/A/real_image_A_epoch_{epoch:04d}.jpg",
                        normalize=True)
             save_image(real_image_B,
-                       f"./samples/{config['EXP_NAME']}/B/real_image_B_epoch_{epoch:04d}.jpg",
+                       f"/content/drive/MyDrive/checkpoints/samples/{config['EXP_NAME']}/B/real_image_B_epoch_{epoch:04d}.jpg",
                        normalize=True)
 
             # Normalize [-1, 1] to [0, 1]
@@ -594,10 +594,10 @@ def train(
             fake_image_B = 0.5 * (g_A_model(real_image_A).data + 1.0)
 
             save_image(fake_image_A.detach(),
-                       f"./samples/{config['EXP_NAME']}/A/fake_image_A_epoch_{epoch:04d}.jpg",
+                       f"/content/drive/MyDrive/checkpoints/samples/{config['EXP_NAME']}/A/fake_image_A_epoch_{epoch:04d}.jpg",
                        normalize=True)
             save_image(fake_image_B.detach(),
-                       f"./samples/{config['EXP_NAME']}/B/fake_image_B_epoch_{epoch:04d}.jpg",
+                       f"/content/drive/MyDrive/checkpoints/samples/{config['EXP_NAME']}/B/fake_image_B_epoch_{epoch:04d}.jpg",
                        normalize=True)
 
 
