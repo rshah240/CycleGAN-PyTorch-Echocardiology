@@ -26,8 +26,8 @@ MODEL:
 
 TRAIN:
   DATASET:
-    SRC_IMAGE_PATH: /content/drive/MyDrive/CAMUS_public_images/
-    DST_IMAGE_PATH: /content/drive/MyDrive/cordis_dataset/
+    SRC_IMAGE_PATH: ./data/CAMUS_public_images/
+    DST_IMAGE_PATH: ./data/cordis_dataset/
     UNPAIRED: True
 
     IMAGE_SIZE: 512

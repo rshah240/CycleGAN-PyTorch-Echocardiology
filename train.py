@@ -138,8 +138,8 @@ def main():
         print("Resume training model not found. Start training from scratch.")
 
     # Create a experiment results
-    samples_dir = os.path.join("/content/drive/MyDrive/checkpoints/samples/", config["EXP_NAME"])
-    results_dir = os.path.join("/content/drive/MyDrive/checkpoints/results/", config["EXP_NAME"])
+    samples_dir = os.path.join("./checkpoints/samples/", config["EXP_NAME"])
+    results_dir = os.path.join("./checkpoints/results/", config["EXP_NAME"])
     make_directory(samples_dir)
     make_directory(results_dir)
     make_directory(os.path.join(samples_dir, "A"))
@@ -583,10 +583,10 @@ def train(
         # Save training image
         if batch_index == batches:
             save_image(real_image_A,
-                       f"/content/drive/MyDrive/checkpoints/samples/{config['EXP_NAME']}/A/real_image_A_epoch_{epoch:04d}.jpg",
+                       f"./checkpoints/samples/{config['EXP_NAME']}/A/real_image_A_epoch_{epoch:04d}.jpg",
                        normalize=True)
             save_image(real_image_B,
-                       f"/content/drive/MyDrive/checkpoints/samples/{config['EXP_NAME']}/B/real_image_B_epoch_{epoch:04d}.jpg",
+                       f"./checkpoints/samples/{config['EXP_NAME']}/B/real_image_B_epoch_{epoch:04d}.jpg",
                        normalize=True)
 
             # Normalize [-1, 1] to [0, 1]
